@@ -1,36 +1,32 @@
 package it.pureorigins.faketitlebuttons
 
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.ActionResult
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
-import org.apache.logging.log4j.LogManager
 
-interface Region {
-    operator fun contains(pos: BlockPos): Boolean
+abstract class Region {
+    val hovering: HashSet<ServerPlayerEntity> = HashSet()
+    abstract operator fun contains(pos: BlockPos): Boolean
 }
 
-fun Region.onClick(listener: (ServerPlayerEntity) -> Unit) {
+fun Region.onClick(
+    click: (ServerPlayerEntity) -> Unit,
+    release: (ServerPlayerEntity) -> Unit = {},
+    delay: Long = FakeTitleButtons.config.defaultDelay
+) {
     FakeTitleButtons.registerClickListener { playerEntity, blockPos ->
-        if (blockPos in this) listener(playerEntity)
-        LogManager.getLogger().info("Click: $blockPos.toString()")
+        if (blockPos in this) {
+            click(playerEntity)
+            FakeTitleButtons.scheduleRelease(delay) { release(playerEntity) }
+        }
         ActionResult.PASS
     }
 }
 
-fun Region.onRelease(listener: (ServerPlayerEntity, World) -> Unit) {
-    TODO("Not yet implemented")
-}
-
-fun Region.onHover(listener: (ServerPlayerEntity) -> Unit) {
-    FakeTitleButtons.registerLookAtListener { playerEntity, blockPos ->
-        if (blockPos in this) listener(playerEntity)
-        LogManager.getLogger().info("Hover: $blockPos.toString()")
+fun Region.onHover(hover: (ServerPlayerEntity) -> Unit, hoverOff: (ServerPlayerEntity) -> Unit = {}) {
+    FakeTitleButtons.registerLookAtListener { player, blockPos ->
+        if (blockPos in this && hovering.add(player)) hover(player)
+        else if (blockPos !in this && hovering.remove(player)) hoverOff(player)
         ActionResult.PASS
     }
-}
-
-fun Region.onHoverOff(listener: (ServerPlayerEntity, World) -> Unit) {
-    TODO("Not yet implemented")
 }

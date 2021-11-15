@@ -18,18 +18,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
     @Shadow
-    ServerPlayerEntity player;
+    public ServerPlayerEntity player;
 
     @Inject(method = "onHandSwing", at = @At("HEAD"))
     public void onHandSwing(HandSwingC2SPacket packet, CallbackInfo ci) {
-        BlockPos pos = ((BlockHitResult) player.raycast(150, 1F, false)).getBlockPos();
+        BlockPos pos = ((BlockHitResult) player.raycast(150, 1F, FakeTitleButtons.INSTANCE.getConfig().getIncludeFluids())).getBlockPos();
         FakeTitleButtons.INSTANCE.getClickListeners().forEach(listener -> listener.invoke(player, pos));
     }
 
     @Inject(method = "onPlayerMove", at = @At("HEAD"))
     public void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        if(packet.changesLook()) {
-            BlockPos pos = ((BlockHitResult) player.raycast(150, 1F, false)).getBlockPos();
+        if (packet.changesLook()) {
+            BlockPos pos = ((BlockHitResult) player.raycast(150, 1F, FakeTitleButtons.INSTANCE.getConfig().getIncludeFluids())).getBlockPos();
             FakeTitleButtons.INSTANCE.getLookAtListeners().forEach(listener -> listener.invoke(player, pos));
         }
     }
