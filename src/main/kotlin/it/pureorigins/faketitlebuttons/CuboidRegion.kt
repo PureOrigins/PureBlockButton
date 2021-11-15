@@ -1,4 +1,4 @@
-package it.pureorigins.purehub;
+package it.pureorigins.faketitlebuttons;
 
 import net.minecraft.util.math.BlockPos;
 

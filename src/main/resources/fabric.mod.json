@@ -1,25 +1,25 @@
 {
     "schemaVersion":1,
-    "id":"purehub",
+    "id":"faketitlebuttons",
     "version":"${version}",
-    "name":"PureHub",
-    "description":"Hub features for PureOrigins minecraft server",
+    "name":"FakeTitleButtons",
+    "description":"This mod allows you to create buttons in minecraft title menu style",
     "authors":[
-        "AgeOfWar"
+        "Raymark97"
     ],
     "contact":{
-        "homepage":"https://github.com/PureOrigins/PureHub",
-        "issues":"https://github.com/PureOrigins/PureHub/issues",
-        "sources":"https://github.com/PureOrigins/PureHub"
+        "homepage":"https://github.com/PureOrigins/FakeTitleButtons",
+        "issues":"https://github.com/PureOrigins/FakeTitleButtons/issues",
+        "sources":"https://github.com/PureOrigins/FakeTitleButtons"
     },
     "license":"Proprietary",
-    "icon":"assets/purehub/icon.png",
+    "icon":"assets/faketitlebuttons/icon.png",
     "environment":"*",
     "entrypoints":{
         "main":[
             {
                 "adapter":"kotlin",
-                "value":"it.pureorigins.purehub.PureHub"
+                "value":"it.pureorigins.faketitlebuttons.FakeTitleButtons"
             }
         ]
     },
@@ -30,5 +30,8 @@
         "minecraft":"1.17.x",
         "java":">=16",
         "pureconfiguration":"^1.0.0"
-    }
+    },
+    "mixins": [
+        "faketitlebuttons.mixins.json"
+    ]
 }
