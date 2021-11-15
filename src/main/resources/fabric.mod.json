@@ -1,0 +1,34 @@
+{
+    "schemaVersion":1,
+    "id":"purehub",
+    "version":"${version}",
+    "name":"PureHub",
+    "description":"Hub features for PureOrigins minecraft server",
+    "authors":[
+        "AgeOfWar"
+    ],
+    "contact":{
+        "homepage":"https://github.com/PureOrigins/PureHub",
+        "issues":"https://github.com/PureOrigins/PureHub/issues",
+        "sources":"https://github.com/PureOrigins/PureHub"
+    },
+    "license":"Proprietary",
+    "icon":"assets/purehub/icon.png",
+    "environment":"*",
+    "entrypoints":{
+        "main":[
+            {
+                "adapter":"kotlin",
+                "value":"it.pureorigins.purehub.PureHub"
+            }
+        ]
+    },
+    "depends":{
+        "fabricloader":">=0.11.6",
+        "fabric":"*",
+        "fabric-language-kotlin":">=1.6.3+kotlin.1.5.21",
+        "minecraft":"1.17.x",
+        "java":">=16",
+        "pureconfiguration":"^1.0.0"
+    }
+}
