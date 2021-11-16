@@ -1,25 +1,25 @@
 {
     "schemaVersion":1,
-    "id":"faketitlebuttons",
+    "id":"pureblockbutton",
     "version":"${version}",
-    "name":"FakeTitleButtons",
-    "description":"This mod allows you to create buttons in minecraft title menu style",
+    "name":"PureBlockButton",
+    "description":"This mod allows you to create buttons with blocks",
     "authors":[
         "Raymark97"
     ],
     "contact":{
-        "homepage":"https://github.com/PureOrigins/FakeTitleButtons",
-        "issues":"https://github.com/PureOrigins/FakeTitleButtons/issues",
-        "sources":"https://github.com/PureOrigins/FakeTitleButtons"
+        "homepage":"https://github.com/PureOrigins/PureBlockButton",
+        "issues":"https://github.com/PureOrigins/PureBlockButton/issues",
+        "sources":"https://github.com/PureOrigins/PureBlockButton"
     },
     "license":"Proprietary",
-    "icon":"assets/faketitlebuttons/icon.png",
+    "icon":"assets/pureblockbutton/icon.png",
     "environment":"*",
     "entrypoints":{
         "main":[
             {
                 "adapter":"kotlin",
-                "value":"it.pureorigins.faketitlebuttons.FakeTitleButtons"
+                "value":"it.pureorigins.pureblockbutton.PureBlockButton"
             }
         ]
     },
@@ -32,6 +32,6 @@
         "pureconfiguration":"^1.0.0"
     },
     "mixins": [
-        "faketitlebuttons.mixins.json"
+        "pureblockbutton.mixins.json"
     ]
 }
