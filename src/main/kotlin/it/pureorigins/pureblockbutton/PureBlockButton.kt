@@ -8,7 +8,6 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
-import org.apache.logging.log4j.LogManager
 
 object PureBlockButton : ModInitializer {
     private val clickListeners = HashMap<Region, (ServerPlayerEntity, BlockPos) -> Unit>()
@@ -17,6 +16,7 @@ object PureBlockButton : ModInitializer {
 
     private val clickTimestamps = HashMap<ServerPlayerEntity, Long>()
     private val hoverPositions = HashMap<ServerPlayerEntity, BlockPos>()
+
 
     var clickDelay: Long = 0
         private set
