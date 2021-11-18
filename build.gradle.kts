@@ -3,6 +3,7 @@ plugins {
     val kotlinVersion: String by System.getProperties()
     kotlin("jvm").version(kotlinVersion)
     kotlin("plugin.serialization").version(kotlinVersion)
+    `maven-publish`
 }
 base {
     val archivesBaseName: String by project
@@ -53,5 +54,23 @@ tasks {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
         withSourcesJar()
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.PureOrigins"
+            artifactId = project.name
+            version = modVersion
+            
+            artifact(tasks.named("jar", Jar::class).get().archiveFile) {
+                builtBy(tasks["remapJar"])
+            }
+            
+            artifact(tasks["sourcesJar"]) {
+                builtBy(tasks["remapSourcesJar"])
+            }
+        }
     }
 }
