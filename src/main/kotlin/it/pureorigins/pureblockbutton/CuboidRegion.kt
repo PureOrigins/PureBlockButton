@@ -1,4 +1,4 @@
-package it.pureorigins.pureblockbutton;
+package it.pureorigins.pureblockbutton
 
 import net.minecraft.util.math.BlockPos
 
@@ -19,5 +19,4 @@ data class CuboidRegion(override val position: BlockPos, val width: Int, val hei
     }
     
     override fun move(position: BlockPos) = copy(position = position)
-    
 }
