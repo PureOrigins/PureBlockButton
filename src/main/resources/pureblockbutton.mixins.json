@@ -4,6 +4,7 @@
   "package": "it.pureorigins.pureblockbutton.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "ChunkDeltaUpdateS2CPacketAccessor",
     "ServerPlayNetworkHandlerMixin"
   ],
   "injectors": {

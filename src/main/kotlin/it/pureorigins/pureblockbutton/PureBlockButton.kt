@@ -10,28 +10,31 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 
 object PureBlockButton : ModInitializer {
-    private val clickListeners = HashMap<Region, (ServerPlayerEntity, BlockPos) -> Unit>()
-    private val hoverListeners = HashMap<Region, (ServerPlayerEntity, BlockPos) -> Unit>()
-    private val hoverOffListeners = HashMap<Region, (ServerPlayerEntity, BlockPos) -> Unit>()
+    private val clickListeners = HashMap<Region, MutableList<(ServerPlayerEntity, BlockPos) -> Unit>>()
+    private val hoverListeners = HashMap<Region, MutableList<(ServerPlayerEntity, BlockPos) -> Unit>>()
+    private val hoverOffListeners = HashMap<Region, MutableList<(ServerPlayerEntity, BlockPos) -> Unit>>()
 
     private val clickTimestamps = HashMap<ServerPlayerEntity, Long>()
     private val hoverPositions = HashMap<ServerPlayerEntity, BlockPos>()
 
-
     var clickDelay: Long = 0
         private set
 
-    var includeFluids: Boolean = false
+    var tickDelta: Float = 1f
         private set
-
+    
     var maxDistance: Double = 150.0
         private set
-
+    
+    var includeFluids: Boolean = false
+        private set
+    
     override fun onInitialize() {
-        val (clickDelay, includeFluids, maxDistance) = json.readFileAs(configFile("fancyparticles.json"), Config())
+        val (clickDelay, maxDistance, tickDelta, includeFluids) = json.readFileAs(configFile("fancyparticles.json"), Config())
         this.clickDelay = clickDelay
-        this.includeFluids = includeFluids
         this.maxDistance = maxDistance
+        this.tickDelta = tickDelta
+        this.includeFluids = includeFluids
 
         ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
             clickTimestamps -= handler.player
@@ -40,15 +43,27 @@ object PureBlockButton : ModInitializer {
     }
 
     fun registerClickEvent(region: Region, listener: (player: ServerPlayerEntity, position: BlockPos) -> Unit) {
-        clickListeners[region] = listener
+        clickListeners.computeIfAbsent(region) { ArrayList() } += listener
     }
 
     fun registerHoverEvent(region: Region, listener: (player: ServerPlayerEntity, position: BlockPos) -> Unit) {
-        hoverListeners[region] = listener
+        hoverListeners.computeIfAbsent(region) { ArrayList() } += listener
     }
 
     fun registerHoverOffEvent(region: Region, listener: (player: ServerPlayerEntity, position: BlockPos) -> Unit) {
-        hoverOffListeners[region] = listener
+        hoverOffListeners.computeIfAbsent(region) { ArrayList() } += listener
+    }
+    
+    fun unregisterClickEvent(region: Region, listener: (player: ServerPlayerEntity, position: BlockPos) -> Unit) {
+        clickListeners[region]?.remove(listener)
+    }
+    
+    fun unregisterHoverEvent(region: Region, listener: (player: ServerPlayerEntity, position: BlockPos) -> Unit) {
+        hoverListeners[region]?.remove(listener)
+    }
+    
+    fun unregisterHoverOffEvent(region: Region, listener: (player: ServerPlayerEntity, position: BlockPos) -> Unit) {
+        hoverOffListeners[region]?.remove(listener)
     }
 
     fun click(player: ServerPlayerEntity, position: BlockPos) {
@@ -57,7 +72,7 @@ object PureBlockButton : ModInitializer {
         if (lastClickMillis == null || now - lastClickMillis > clickDelay) {
             clickListeners.forEach { (region, listener) ->
                 if (position in region) {
-                    listener(player, position)
+                    listener.forEach { it(player, position) }
                     clickTimestamps[player] = now
                 }
             }
@@ -68,23 +83,23 @@ object PureBlockButton : ModInitializer {
         val oldPos = hoverPositions[player]
         hoverListeners.forEach { (region, listener) ->
             if (position in region && (oldPos == null || oldPos !in region)) {
-                listener(player, position)
+                listener.forEach { it(player, position) }
                 hoverPositions[player] = position
             }
         }
         hoverOffListeners.forEach { (region, listener) ->
             if (oldPos != null && oldPos in region && position !in region) {
-                listener(player, position)
+                listener.forEach { it(player, oldPos) }
                 hoverPositions[player] = position
             }
         }
     }
 
-    fun leave(player: ServerPlayerEntity) {
+    fun hoverOff(player: ServerPlayerEntity) {
         val oldPos = hoverPositions[player] ?: return
         hoverOffListeners.forEach { (region, listener) ->
             if (oldPos in region) {
-                listener(player, oldPos)
+                listener.forEach { it(player, oldPos) }
                 hoverPositions -= player
             }
         }
@@ -93,7 +108,8 @@ object PureBlockButton : ModInitializer {
     @Serializable
     data class Config(
         val clickDelay: Long = 1000,
-        val includeFluids: Boolean = false,
-        val maxDistance: Double = 150.0
+        val maxDistance: Double = 150.0,
+        val tickDelta: Float = 1f,
+        val includeFluids: Boolean = false
     )
 }

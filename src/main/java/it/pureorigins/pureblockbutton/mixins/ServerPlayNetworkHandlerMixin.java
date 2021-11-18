@@ -19,7 +19,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onHandSwing", at = @At("TAIL"))
     public void onHandSwing(HandSwingC2SPacket packet, CallbackInfo callback) {
-        var hit = (BlockHitResult) player.raycast(PureBlockButton.INSTANCE.getMaxDistance(), 1F, PureBlockButton.INSTANCE.getIncludeFluids());
+        var hit = (BlockHitResult) player.raycast(PureBlockButton.INSTANCE.getMaxDistance(), PureBlockButton.INSTANCE.getTickDelta(), PureBlockButton.INSTANCE.getIncludeFluids());
         if (hit.getType() == BlockHitResult.Type.BLOCK) {
             PureBlockButton.INSTANCE.click(player, hit.getBlockPos());
         }
@@ -31,7 +31,7 @@ public class ServerPlayNetworkHandlerMixin {
         if (hit.getType() == BlockHitResult.Type.BLOCK) {
             PureBlockButton.INSTANCE.hover(player, hit.getBlockPos());
         } else {
-            PureBlockButton.INSTANCE.leave(player);
+            PureBlockButton.INSTANCE.hoverOff(player);
         }
     }
 }
