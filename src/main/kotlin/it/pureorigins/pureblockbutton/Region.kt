@@ -50,7 +50,7 @@ fun ServerPlayerEntity.sendRegionChange(region: Region, newBlocks: BlockPos) {
     val positions = region.getChunkedPositions()
     val blockStates = region.getChunkedBlockStates(newBlocks, world)
     positions.forEach { (section, positions) ->
-        val packet = ChunkDeltaUpdateS2CPacket(section, positions, world.getChunk(section.x, section.y).getSection(section.y), true).apply {
+        val packet = ChunkDeltaUpdateS2CPacket(section, positions, world.getChunk(section.x, section.z).getSection(section.y), true).apply {
             (this as ChunkDeltaUpdateS2CPacketAccessor).setBlockStates(blockStates[section]!!.toTypedArray())
         }
         networkHandler.sendPacket(packet)
@@ -60,6 +60,6 @@ fun ServerPlayerEntity.sendRegionChange(region: Region, newBlocks: BlockPos) {
 fun ServerPlayerEntity.clearRegionChange(region: Region) {
     val positions = region.getChunkedPositions()
     positions.forEach { (section, positions) ->
-        networkHandler.sendPacket(ChunkDeltaUpdateS2CPacket(section, positions, world.getChunk(section.x, section.y).getSection(section.y), true))
+        networkHandler.sendPacket(ChunkDeltaUpdateS2CPacket(section, positions, world.getChunk(section.x, section.z).getSection(section.y), true))
     }
 }
