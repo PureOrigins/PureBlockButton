@@ -27,7 +27,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onPlayerMove", at = @At("TAIL"))
     public void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo callback) {
-        var hit = (BlockHitResult) player.raycast(PureBlockButton.INSTANCE.getMaxDistance(), 1F, PureBlockButton.INSTANCE.getIncludeFluids());
+        var hit = (BlockHitResult) player.raycast(PureBlockButton.INSTANCE.getMaxDistance(), PureBlockButton.INSTANCE.getTickDelta(), PureBlockButton.INSTANCE.getIncludeFluids());
         if (hit.getType() == BlockHitResult.Type.BLOCK) {
             PureBlockButton.INSTANCE.hover(player, hit.getBlockPos());
         } else {
