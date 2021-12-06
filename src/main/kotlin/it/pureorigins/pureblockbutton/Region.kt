@@ -60,6 +60,6 @@ fun ServerPlayerEntity.sendRegionChange(region: Region, newBlocks: BlockPos) {
 fun ServerPlayerEntity.clearRegionChange(region: Region) {
     val positions = region.getChunkedPositions()
     positions.forEach { (section, positions) ->
-        networkHandler.sendPacket(ChunkDeltaUpdateS2CPacket(section, positions, world.getChunk(section.x, section.z).getSection(section.y), true))
+        networkHandler.sendPacket(ChunkDeltaUpdateS2CPacket(section, positions, world.getChunk(section.x, section.z).getSection(section.y + 4), true))
     }
 }
