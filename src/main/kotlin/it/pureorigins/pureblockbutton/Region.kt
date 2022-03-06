@@ -1,7 +1,6 @@
 package it.pureorigins.pureblockbutton
 
 import org.bukkit.Location
-import org.bukkit.block.Block
 import org.bukkit.entity.Player
 
 interface Region {
@@ -21,9 +20,9 @@ fun Region.onHover(listener: (player: Player, position: Location) -> Unit) =
 fun Region.onHoverOff(listener: (player: Player, position: Location) -> Unit) =
     PureBlockButton.registerHoverOffEvent(this, listener)
 
-fun Player.sendRegionChange(region: Region, newBlocks: Block) {
-    val positions = region.getPositions()
-
+fun Player.sendRegionChange(region: Region, newBlocks: Location) {
+    val locDelta = newBlocks.subtract(region.location)
+    player?.sendMultiBlockChange(region.getPositions().associateWith { it.add(locDelta).block.blockData }.toMap())
 }
 
 fun Player.clearRegionChange(region: Region) {
