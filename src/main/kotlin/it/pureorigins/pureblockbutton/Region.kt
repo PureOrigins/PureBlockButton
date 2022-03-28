@@ -12,13 +12,13 @@ interface Region {
 }
 
 fun Region.onClick(listener: (player: Player, position: Location) -> Unit) =
-    PureBlockButton.registerClickEvent(this, listener)
+    plugin.registerClickEvent(this, listener)
 
 fun Region.onHover(listener: (player: Player, position: Location) -> Unit) =
-    PureBlockButton.registerHoverEvent(this, listener)
+    plugin.registerHoverEvent(this, listener)
 
 fun Region.onHoverOff(listener: (player: Player, position: Location) -> Unit) =
-    PureBlockButton.registerHoverOffEvent(this, listener)
+    plugin.registerHoverOffEvent(this, listener)
 
 fun Player.sendRegionChange(region: Region, newBlocks: Location) {
     val locDelta = newBlocks.subtract(region.location)

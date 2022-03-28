@@ -17,67 +17,67 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 
+internal lateinit var plugin: PureBlockButton private set
+
 class PureBlockButton : JavaPlugin(), Listener {
-
-    companion object {
-        private val clickListeners = HashMap<Region, MutableList<(Player, Location) -> Unit>>()
-        private val hoverListeners = HashMap<Region, MutableList<(Player, Location) -> Unit>>()
-        private val hoverOffListeners = HashMap<Region, MutableList<(Player, Location) -> Unit>>()
-
-        private val clickTimestamps = HashMap<Player, Long>()
-        private val hoverTimestamps = HashMap<Player, Long>()
-        private val hoverPositions = HashMap<Player, Location>()
-
-        var clickDelay: Long = 0
-            private set
-
-        var hoverDelay: Long = 0
-            private set
-
-        var tickDelta: Float = 1f
-            private set
-
-        var maxDistance: Int = 150
-            private set
-
-        var includeFluids: TargetBlockInfo.FluidMode = NEVER
-            private set
-
-        fun registerClickEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
-            clickListeners.computeIfAbsent(region) { ArrayList() } += listener
-        }
-
-        fun registerHoverEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
-            hoverListeners.computeIfAbsent(region) { ArrayList() } += listener
-        }
-
-        fun registerHoverOffEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
-            hoverOffListeners.computeIfAbsent(region) { ArrayList() } += listener
-        }
-
-        fun unregisterClickEvent(region: Region, listener: (player: Player, block: Location) -> Unit) {
-            clickListeners[region]?.remove(listener)
-        }
-
-        fun unregisterHoverEvent(region: Region, listener: (player: Player, block: Location) -> Unit) {
-            hoverListeners[region]?.remove(listener)
-        }
-
-        fun unregisterHoverOffEvent(region: Region, listener: (player: Player, block: Location) -> Unit) {
-            hoverOffListeners[region]?.remove(listener)
-        }
+    private val clickListeners = HashMap<Region, MutableList<(Player, Location) -> Unit>>()
+    private val hoverListeners = HashMap<Region, MutableList<(Player, Location) -> Unit>>()
+    private val hoverOffListeners = HashMap<Region, MutableList<(Player, Location) -> Unit>>()
+    
+    private val clickTimestamps = HashMap<Player, Long>()
+    private val hoverTimestamps = HashMap<Player, Long>()
+    private val hoverPositions = HashMap<Player, Location>()
+    
+    var clickDelay: Long = 0
+        private set
+    
+    var hoverDelay: Long = 0
+        private set
+    
+    var tickDelta: Float = 1f
+        private set
+    
+    var maxDistance: Int = 150
+        private set
+    
+    var includeFluids: TargetBlockInfo.FluidMode = NEVER
+        private set
+    
+    fun registerClickEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
+        clickListeners.computeIfAbsent(region) { ArrayList() } += listener
     }
-
+    
+    fun registerHoverEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
+        hoverListeners.computeIfAbsent(region) { ArrayList() } += listener
+    }
+    
+    fun registerHoverOffEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
+        hoverOffListeners.computeIfAbsent(region) { ArrayList() } += listener
+    }
+    
+    fun unregisterClickEvent(region: Region, listener: (player: Player, block: Location) -> Unit) {
+        clickListeners[region]?.remove(listener)
+    }
+    
+    fun unregisterHoverEvent(region: Region, listener: (player: Player, block: Location) -> Unit) {
+        hoverListeners[region]?.remove(listener)
+    }
+    
+    fun unregisterHoverOffEvent(region: Region, listener: (player: Player, block: Location) -> Unit) {
+        hoverOffListeners[region]?.remove(listener)
+    }
+    
+    override fun onLoad() {
+        plugin = this
+    }
+    
     override fun onEnable() {
-        val (clickDelay, hoverDelay, maxDistance, tickDelta, includeFluids) = json.readFileAs(
-            file("pureblockbutton.json"),
-            Config()
-        )
-        PureBlockButton.clickDelay = clickDelay
-        PureBlockButton.hoverDelay = hoverDelay
-        PureBlockButton.maxDistance = maxDistance
-        PureBlockButton.tickDelta = tickDelta
-        PureBlockButton.includeFluids = if (includeFluids) ALWAYS else NEVER
+        val (clickDelay, hoverDelay, maxDistance, tickDelta, includeFluids) = json.readFileAs(file("config.json"), Config())
+        this.clickDelay = clickDelay
+        this.hoverDelay = hoverDelay
+        this.maxDistance = maxDistance
+        this.tickDelta = tickDelta
+        this.includeFluids = if (includeFluids) ALWAYS else NEVER
 
         registerEvents(this)
     }
@@ -99,8 +99,8 @@ class PureBlockButton : JavaPlugin(), Listener {
 
     @EventHandler
     fun hover(e: PlayerMoveEvent) {
-        val block = e.player.getTargetBlock(maxDistance, includeFluids) ?: return
         val player = e.player
+        val block = player.getTargetBlock(maxDistance, includeFluids) ?: return
         val oldPos = hoverPositions[player]
         val lastHoverMillis = hoverTimestamps[player]
         val now = System.currentTimeMillis()
@@ -121,28 +121,12 @@ class PureBlockButton : JavaPlugin(), Listener {
         }
     }
 
-    /*    fun hoverOff(player: ServerPlayerEntity) {
-        val oldPos = hoverPositions[player] ?: return
-        val lastHoverMillis = hoverTimestamps[player]
-        val now = System.currentTimeMillis()
-        if (lastHoverMillis == null || now - lastHoverMillis > hoverDelay) {
-            hoverOffListeners.forEach { (region, listener) ->
-                if (oldPos in region) {
-                    listener.forEach { it(player, oldPos) }
-                    hoverPositions -= player
-                }
-            }
-        }
-    }*/
-
     @EventHandler
     fun onPlayerQuit(e: PlayerQuitEvent) {
         clickTimestamps -= e.player
         hoverTimestamps -= e.player
         hoverPositions -= e.player
     }
-
-
 
     @Serializable
     data class Config(
