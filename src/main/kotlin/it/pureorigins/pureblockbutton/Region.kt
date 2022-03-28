@@ -22,9 +22,9 @@ fun Region.onHoverOff(listener: (player: Player, position: Location) -> Unit) =
 
 fun Player.sendRegionChange(region: Region, newBlocks: Location) {
     val locDelta = newBlocks.subtract(region.location)
-    player?.sendMultiBlockChange(region.getPositions().associateWith { it.add(locDelta).block.blockData }.toMap())
+    sendMultiBlockChange(region.getPositions().associateWith { it.add(locDelta).block.blockData }.toMap())
 }
 
 fun Player.clearRegionChange(region: Region) {
-    player?.sendMultiBlockChange(region.getPositions().associateWith { it.block.blockData }.toMap())
+    sendMultiBlockChange(region.getPositions().associateWith { it.block.blockData }.toMap())
 }
