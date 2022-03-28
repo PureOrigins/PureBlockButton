@@ -12,6 +12,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -32,9 +33,6 @@ class PureBlockButton : JavaPlugin(), Listener {
         private set
     
     var hoverDelay: Long = 0
-        private set
-    
-    var tickDelta: Float = 1f
         private set
     
     var maxDistance: Int = 150
@@ -72,11 +70,10 @@ class PureBlockButton : JavaPlugin(), Listener {
     }
     
     override fun onEnable() {
-        val (clickDelay, hoverDelay, maxDistance, tickDelta, includeFluids) = json.readFileAs(file("config.json"), Config())
+        val (clickDelay, hoverDelay, maxDistance, includeFluids) = json.readFileAs(file("config.json"), Config())
         this.clickDelay = clickDelay
         this.hoverDelay = hoverDelay
         this.maxDistance = maxDistance
-        this.tickDelta = tickDelta
         this.includeFluids = if (includeFluids) ALWAYS else NEVER
 
         registerEvents(this)
@@ -84,6 +81,7 @@ class PureBlockButton : JavaPlugin(), Listener {
 
     @EventHandler
     fun onClick(e: PlayerInteractEvent) {
+        if (e.action != Action.LEFT_CLICK_AIR && e.action != Action.LEFT_CLICK_BLOCK) return
         val block = e.player.getTargetBlock(maxDistance, includeFluids) ?: return
         val lastClickMillis = clickTimestamps[e.player]
         val now = System.currentTimeMillis()
@@ -133,7 +131,6 @@ class PureBlockButton : JavaPlugin(), Listener {
         val clickDelay: Long = 1000,
         val hoverDelay: Long = 200,
         val maxDistance: Int = 120,
-        val tickDelta: Float = 1f,
         val includeFluids: Boolean = false
     )
 }
