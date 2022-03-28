@@ -148,7 +148,7 @@ class PureBlockButton : JavaPlugin(), Listener {
     data class Config(
         val clickDelay: Long = 1000,
         val hoverDelay: Long = 200,
-        val maxDistance: Int = 150,
+        val maxDistance: Int = 120,
         val tickDelta: Float = 1f,
         val includeFluids: Boolean = false
     )
