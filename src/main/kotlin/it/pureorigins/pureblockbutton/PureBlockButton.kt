@@ -1,13 +1,13 @@
 package it.pureorigins.pureblockbutton
 
-import com.destroystokyo.paper.block.TargetBlockInfo
-import com.destroystokyo.paper.block.TargetBlockInfo.FluidMode.ALWAYS
-import com.destroystokyo.paper.block.TargetBlockInfo.FluidMode.NEVER
 import it.pureorigins.common.file
 import it.pureorigins.common.json
 import it.pureorigins.common.readFileAs
 import it.pureorigins.common.registerEvents
 import kotlinx.serialization.Serializable
+import org.bukkit.FluidCollisionMode
+import org.bukkit.FluidCollisionMode.ALWAYS
+import org.bukkit.FluidCollisionMode.NEVER
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -38,7 +38,7 @@ class PureBlockButton : JavaPlugin(), Listener {
     var maxDistance: Int = 150
         private set
     
-    var includeFluids: TargetBlockInfo.FluidMode = NEVER
+    var includeFluids: FluidCollisionMode = NEVER
         private set
     
     fun registerClickEvent(region: Region, listener: (player: Player, position: Location) -> Unit) {
@@ -82,7 +82,7 @@ class PureBlockButton : JavaPlugin(), Listener {
     @EventHandler
     fun onClick(e: PlayerInteractEvent) {
         if (e.action != Action.LEFT_CLICK_AIR && e.action != Action.LEFT_CLICK_BLOCK) return
-        val block = e.player.getTargetBlock(maxDistance, includeFluids) ?: return
+        val block = e.player.getTargetBlockExact(maxDistance, includeFluids) ?: return
         val lastClickMillis = clickTimestamps[e.player]
         val now = System.currentTimeMillis()
         if (lastClickMillis == null || now - lastClickMillis > clickDelay) {
@@ -96,9 +96,9 @@ class PureBlockButton : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun hover(e: PlayerMoveEvent) {
+    fun onHover(e: PlayerMoveEvent) {
         val player = e.player
-        val block = player.getTargetBlock(maxDistance, includeFluids) ?: return
+        val block = player.getTargetBlockExact(maxDistance, includeFluids) ?: return
         val oldPos = hoverPositions[player]
         val lastHoverMillis = hoverTimestamps[player]
         val now = System.currentTimeMillis()
