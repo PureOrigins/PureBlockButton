@@ -1,10 +1,8 @@
 package it.pureorigins.pureblockbutton
 
-import it.pureorigins.common.file
-import it.pureorigins.common.json
-import it.pureorigins.common.readFileAs
-import it.pureorigins.common.registerEvents
+import it.pureorigins.common.*
 import kotlinx.serialization.Serializable
+import org.bukkit.Bukkit
 import org.bukkit.FluidCollisionMode
 import org.bukkit.FluidCollisionMode.ALWAYS
 import org.bukkit.FluidCollisionMode.NEVER
@@ -14,7 +12,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -36,6 +33,9 @@ class PureBlockButton : JavaPlugin(), Listener {
         private set
     
     var maxDistance: Int = 150
+        private set
+    
+    var lookDelay: Long = 10
         private set
     
     var includeFluids: FluidCollisionMode = NEVER
@@ -70,13 +70,19 @@ class PureBlockButton : JavaPlugin(), Listener {
     }
     
     override fun onEnable() {
-        val (clickDelay, hoverDelay, maxDistance, includeFluids) = json.readFileAs(file("config.json"), Config())
+        val (clickDelay, hoverDelay, maxDistance, lookDelay, includeFluids) = json.readFileAs(file("config.json"), Config())
         this.clickDelay = clickDelay
         this.hoverDelay = hoverDelay
         this.maxDistance = maxDistance
+        this.lookDelay = lookDelay
         this.includeFluids = if (includeFluids) ALWAYS else NEVER
 
         registerEvents(this)
+        runTaskTimer(0, lookDelay) {
+            Bukkit.getOnlinePlayers().forEach {
+                onHover(it)
+            }
+        }
     }
 
     @EventHandler
@@ -95,9 +101,7 @@ class PureBlockButton : JavaPlugin(), Listener {
         }
     }
 
-    @EventHandler
-    fun onHover(e: PlayerMoveEvent) {
-        val player = e.player
+    fun onHover(player: Player) {
         val block = player.getTargetBlockExact(maxDistance, includeFluids) ?: return
         val oldPos = hoverPositions[player]
         val lastHoverMillis = hoverTimestamps[player]
@@ -131,6 +135,7 @@ class PureBlockButton : JavaPlugin(), Listener {
         val clickDelay: Long = 1000,
         val hoverDelay: Long = 200,
         val maxDistance: Int = 120,
+        val lookDelay: Long = 10,
         val includeFluids: Boolean = false
     )
 }
